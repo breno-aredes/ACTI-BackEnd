@@ -1,0 +1,1 @@
+export { PartnersRepository } from "./partnersRepository";
