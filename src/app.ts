@@ -3,6 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 import Database from "./config/database";
 import partnersRoutes from "./routes/partnersRoutes";
+import cnpjRoutes from "./routes/cnpjRoutes";
 import { errorHandler, requestLogger, responseLogger } from "./middlewares";
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(requestLogger);
 app.use(responseLogger);
 
 app.use("/partners", partnersRoutes);
+app.use("/cnpj", cnpjRoutes);
 
 app.get("/health", (req, res) => {
   res.json({
