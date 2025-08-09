@@ -9,9 +9,18 @@ ACTI-BackEnd/
 ├── src/
 │   ├── config/         # Configurações (banco de dados)
 │   ├── controllers/    # Controladores das rotas
+│   │   ├── partnersController.ts
+│   │   └── cnpjController.ts
 │   ├── routes/         # Definição das rotas
-│   ├── services/       # Lógica de negócio e conexão com banco
+│   │   ├── partnersRoutes.ts
+│   │   └── cnpjRoutes.ts
+│   ├── services/       # Lógica de negócio e integração com APIs
+│   │   ├── partnersService.ts
+│   │   └── cnpjService.ts
 │   ├── types/          # Definições de tipos TypeScript
+│   │   ├── partners.ts
+│   │   └── cnpj.ts
+│   ├── middlewares/    # Middlewares customizados
 │   ├── app.ts          # Configuração principal da aplicação
 │   └── server.ts       # Ponto de entrada do servidor
 ├── dist/               # Código JavaScript compilado
@@ -94,6 +103,52 @@ npm start
 
 - **POST** `/partners` - Cadastra um novo parceiro comercial
 
+### CNPJ (API Externa)
+
+- **GET** `/cnpj/:cnpj` - Consulta dados de CNPJ na Receita Federal
+
+#### Exemplo de requisição GET /cnpj/:cnpj:
+
+```bash
+GET /cnpj/12345678000195
+```
+
+#### Resposta de sucesso:
+
+```json
+{
+  "success": true,
+  "data": {
+    "companyName": "EMPRESA EXEMPLO LTDA",
+    "tradeName": "EXEMPLO",
+    "email": "contato@empresa.com.br",
+    "phone": "(11) 1234-5678"
+  }
+}
+```
+
+#### Possíveis respostas de erro:
+
+```json
+// CNPJ inválido (400)
+{
+  "success": false,
+  "message": "CNPJ deve ter 14 dígitos"
+}
+
+// CNPJ não encontrado (404)
+{
+  "success": false,
+  "message": "CNPJ não encontrado"
+}
+
+// Rate limit da API externa (429)
+{
+  "success": false,
+  "message": "Muitas consultas. Tente novamente em alguns minutos."
+}
+```
+
 ### Exemplo de requisição POST /partners:
 
 ```json
@@ -135,6 +190,7 @@ npm start
 - **dotenv** - Gerenciamento de variáveis de ambiente
 - **mssql** - Driver SQL Server para Node.js
 - **joi** - Validação de esquemas
+- **axios** - Cliente HTTP para APIs externas
 
 ### Desenvolvimento
 
@@ -145,6 +201,37 @@ npm start
 - **@types/mssql** - Tipos TypeScript para MSSQL
 - **ts-node** - Execução TypeScript direta
 - **nodemon** - Auto-reload durante desenvolvimento
+
+## Integrações com APIs Externas
+
+### ReceitaWS - Consulta de CNPJ
+
+O backend integra com a API da **ReceitaWS** para consulta de dados de CNPJ:
+
+- **URL Base**: `https://www.receitaws.com.br/v1`
+- **Endpoint**: `/cnpj/{cnpj}`
+- **Método**: GET
+- **Rate Limit**: Limitado pela API externa
+- **Timeout**: 15 segundos
+
+#### Dados retornados pela ReceitaWS:
+
+- Razão Social (nome)
+- Nome Fantasia (fantasia)
+- Email (email)
+- Telefone (telefone)
+- Situação da empresa
+- Dados de endereço
+- Atividades principais e secundárias
+
+#### Tratamento de erros:
+
+- **400**: CNPJ inválido
+- **404**: CNPJ não encontrado
+- **429**: Rate limit excedido
+- **500**: Erro interno da API externa
+
+> **Nota**: A consulta de CNPJ é feita de forma síncrona e pode levar alguns segundos dependendo da resposta da API externa.
 
 ## Processo Seletivo ACTi
 
