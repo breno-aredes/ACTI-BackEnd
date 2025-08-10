@@ -32,12 +32,12 @@ const partnersSchema = Joi.object({
   }),
 
   CnpjCpf: Joi.string()
-    .pattern(/^(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\d{3}\.\d{3}\.\d{3}-\d{2})$/)
+    .pattern(/^\d{11}$|^\d{14}$/)
     .required()
     .messages({
       "any.required": "CNPJ/CPF é obrigatório",
       "string.pattern.base":
-        "CNPJ/CPF deve estar no formato correto (XX.XXX.XXX/XXXX-XX ou XXX.XXX.XXX-XX)",
+        "CNPJ/CPF deve conter apenas números (11 dígitos para CPF ou 14 para CNPJ)",
     }),
 
   Segment: Joi.string().min(1).max(100).required().messages({
@@ -53,11 +53,11 @@ const partnersSchema = Joi.object({
   }),
 
   ZipCode: Joi.string()
-    .pattern(/^\d{5}-\d{3}$/)
+    .pattern(/^\d{8}$/)
     .required()
     .messages({
       "any.required": "CEP é obrigatório",
-      "string.pattern.base": "CEP deve estar no formato XXXXX-XXX",
+      "string.pattern.base": "CEP deve conter 8 dígitos",
     }),
 
   Country: Joi.string().max(50).default("Brasil"),
@@ -98,25 +98,26 @@ const partnersSchema = Joi.object({
   }),
 
   Phone: Joi.string()
-    .pattern(/^\(\d{2}\)\s\d{4,5}-\d{4}$/)
+    .pattern(/^\d{10,11}$/)
     .required()
     .messages({
       "any.required": "Telefone é obrigatório",
-      "string.pattern.base": "Telefone deve estar no formato (XX) XXXXX-XXXX",
+      "string.pattern.base": "Telefone deve conter 10 ou 11 dígitos",
     }),
 
-  AddressComplement: Joi.string().max(255).optional().messages({
+  AddressComplement: Joi.string().max(255).allow("").optional().messages({
     "string.max": "Complemento deve ter no máximo 255 caracteres",
   }),
 
   MobilePhone: Joi.string()
-    .pattern(/^\(\d{2}\)\s\d{5}-\d{4}$/)
+    .pattern(/^\d{10,11}$/)
+    .allow("")
     .optional()
     .messages({
-      "string.pattern.base": "Celular deve estar no formato (XX) XXXXX-XXXX",
+      "string.pattern.base": "Celular deve conter 10 ou 11 dígitos",
     }),
 
-  Notes: Joi.string().optional(),
+  Notes: Joi.string().allow("").optional(),
 });
 
 export const validatePartners = (
